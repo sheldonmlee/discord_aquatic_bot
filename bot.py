@@ -57,6 +57,9 @@ class Bot(discord.Client):
         elif message.content.startswith("$aquatic"):
             await message.channel.send(randomAquatic())
 
+token_file = open("token.txt", "r")
+token = token_file.readline()
+token_file.close()
 
 bot = Bot()
-bot.run("NzE5Njk0MDM1ODAyOTE0ODc4.Xv0eiA.lHKbn3MFvYjqvBoEND51cP_y_gA");
+bot.run(token);
