@@ -57,9 +57,13 @@ class Bot(discord.Client):
         elif message.content.startswith("$aquatic"):
             await message.channel.send(randomAquatic())
 
+#
+# Ensure token on first line, with no whitespaces at the end/beginning
+#
 token_file = open("token.txt", "r")
 token = token_file.readline()
 token_file.close()
+print("\'"+token+"\'");
 
 bot = Bot()
 bot.run(token);
