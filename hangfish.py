@@ -48,15 +48,19 @@ class HangFish():
     def getString(self):
         return self.graphical_string + 'guesses left = {}\n'.format(self.guesses) + self.graphical_progress_string
 
-hangFish = HangFish(None, "Gen")
+def main():
+    hangFish = HangFish(None, "Gen")
 
-print(hangFish.getString())
-while (hangFish.running):
-    try:
-        letter = str(input("Enter Letter\n"))[0]
-        hangFish.guess(letter)
-        print(hangFish.getString())
-    except IndexError:
-        print("Please enter a letter.")
+    print(hangFish.getString())
+    while (hangFish.running):
+        try:
+            letter = str(input("Enter Letter\n"))[0]
+            hangFish.guess(letter)
+            print(hangFish.getString())
+        except IndexError:
+            print("Please enter a letter.")
 
-print (hangFish.status_message)
+    print (hangFish.status_message)
+
+if __name__ == "__main__":
+    main()
