@@ -4,7 +4,7 @@ from hangfish import Hangfish
 from command import Command as cmd
 
 AQUATIC_EMOJIS = ( "octopus", "squid", "shrimp", "lobster", "oyster", "crab", "blowfish", "tropical_fish", "fish", "dolphin", "whale", "whale2", "shark", )
-AQUATIC_ANIMALS = ( "octopus", "squid", "shrimp", "lobster", "oyster", "crab", "blowfish", "tropical_fish", "fish", "dolphin", "whale", "shark", )
+AQUATIC_ANIMALS = ( "octopus", "squid", "shrimp", "lobster", "oyster", "crab", "blowfish", "fish", "dolphin", "whale", "shark", )
 
 def strToEmoji(string):
     return ":"+string+":"
