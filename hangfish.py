@@ -1,7 +1,7 @@
-alphabet = "abcdefghijklmnopqrstuvwxyzABCDKFGHLJKLMJOPQRSFUVWXYZ"
-class HangFish():
-
-    def __init__(self, channel, word):
+class Hangfish():
+    discord_instances = {}
+    
+    def __init__(self, word):
         # Word to be guessed
         self.word = word
 
@@ -16,7 +16,7 @@ class HangFish():
         for i in range(len(word)):
             self.graphical_progress_string += "_"
 
-        self.guesses = 10
+        self.guesses = 26
         self.letters_guessed = 0
 
         # Game state
@@ -24,18 +24,20 @@ class HangFish():
         self.status_message = ""
 
     def guess(self, c):
-        for i in range(len(self.word)):
-            if self.word[i] == c:
-                if not self.guessed_indices[i]:
-                    self.letters_guessed += 1
-                    temp_list = list(self.graphical_progress_string)
-                    temp_list[i] = c
-                    self.graphical_progress_string = ''.join(temp_list)
-                self.guessed_indices[i] = True
+        if not self.running: return
+        if len(c) == 1:
+            for i in range(len(self.word)):
+                if self.word[i] == c:
+                    if not self.guessed_indices[i]:
+                        self.letters_guessed += 1
+                        temp_list = list(self.graphical_progress_string)
+                        temp_list[i] = c
+                        self.graphical_progress_string = ''.join(temp_list)
+                    self.guessed_indices[i] = True
 
         self.guesses -= 1
 
-        word_guessed = self.letters_guessed == len(self.word)
+        word_guessed = self.letters_guessed == len(self.word) or c == self.word
         out_of_guesses = self.guesses == 0
 
         if word_guessed or out_of_guesses:
@@ -46,21 +48,23 @@ class HangFish():
             self.status_message = "Out of Guesses."
 
     def getString(self):
-        return self.graphical_string + 'guesses left = {}\n'.format(self.guesses) + self.graphical_progress_string
+        string = ""
+        string += self.graphical_string + 'guesses left = {}\n'.format(self.guesses) + self.graphical_progress_string + '\n'
+        if not self.running: string += self.status_message
+        return string
+
 
 def main():
-    hangFish = HangFish(None, "Gen")
+    hangfish = Hangfish("Gen")
 
-    print(hangFish.getString())
-    while (hangFish.running):
+    print(hangfish.getString())
+    while (hangfish.running):
         try:
             letter = str(input("Enter Letter\n"))[0]
-            hangFish.guess(letter)
-            print(hangFish.getString())
+            hangfish.guess(letter)
+            print(hangfish.getString())
         except IndexError:
             print("Please enter a letter.")
-
-    print (hangFish.status_message)
 
 if __name__ == "__main__":
     main()
