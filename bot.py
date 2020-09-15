@@ -1,69 +1,95 @@
 import discord
 import random
+from hangfish import Hangfish
+from command import Command as cmd
 
-aquatic = [
-        "octopus",
-        "squid",
-        "shrimp",
-        "lobster",
-        "oyster",
-        "crab",
-        "blowfish",
-        "tropical_fish",
-        "fish",
-        "dolphin",
-        "whale",
-        "whale2",
-        "shark",
-    ]
+AQUATIC_EMOJIS = ( "octopus", "squid", "shrimp", "lobster", "oyster", "crab", "blowfish", "tropical_fish", "fish", "dolphin", "whale", "whale2", "shark", )
+AQUATIC_ANIMALS = ( "octopus", "squid", "shrimp", "lobster", "oyster", "crab", "blowfish", "tropical_fish", "fish", "dolphin", "whale", "shark", )
 
 def strToEmoji(string):
     return ":"+string+":"
 
 def randomAquatic():
-    i = random.randint(0, len(aquatic)-1)
-    return strToEmoji(aquatic[i])
+    return strToEmoji(AQUATIC_EMOJIS[random.randint(0, len(AQUATIC_EMOJIS)-1)])
 
 def aquaticAll():
     string = ""
-    for animal in aquatic:
-        string += strToEmoji(animal)
+    for animal in AQUATIC_EMOJIS:
+            string += strToEmoji(animal)
     return string
+
+def aquatic(*args):
+    if len(args) > 0:
+        if args[0] == "-a": return aquaticAll()
+        else: return "Unknown Argument: {}".format(args[0])
+    return randomAquatic()
+
 
 class Bot(discord.Client):
 
+    hangfish_instances = {}
+
     async def on_ready(self):
         print("We have logged in as {}".format(self.user))
-        pass
 
     async def on_message(self, message):
         if message.author == self.user:
-            return
+                return
         
         print ("{} sent {}".format(message.author, message.content))
-        if message.content.startswith("$ping"):
-            await message.channel.send(
-                    "@{} pong!".format(
-                        message.author.mention
-                        )
-                    )
-        
-        if message.content.startswith("$hello"):
-            await message.channel.send("Hello!")
 
-        if message.content.startswith("$aquaticall"):
-            await message.channel.send(aquaticAll())
-            
-        elif message.content.startswith("$aquatic"):
-            await message.channel.send(randomAquatic())
+        await cmd.call(message.channel, message.content)
+
+#
+# Define callbacks
+#
+
+    @staticmethod
+    def getHangfishInstance(channel):
+        return Bot.hangfish_instances.get(channel.id, None)
+
+    @staticmethod
+    async def createHangfishInstance(channel):
+        word = random.choice(AQUATIC_ANIMALS)
+
+        message = None
+        if Bot.getHangfishInstance(channel) is not None:
+            message = "Hangfish instance already created. Creating new instance"
+        else:
+            message = "Creating Hangfish instance."
+        Bot.hangfish_instances[channel.id] = Hangfish(word)
+        await channel.send(message)
+        await channel.send("```"+Bot.getHangfishInstance(channel).getString()+"```")
+
+    @staticmethod
+    async def updateHangfishInstance(channel, guess):
+        instance = Bot.getHangfishInstance(channel)
+        if instance is None:
+            await channel.send("Hangfish instance not created.")
+        instance.guess(guess)
+        await channel.send("```"+instance.getString()+"```")
+        if not instance.running:
+            del Bot.hangfish_instances[channel.id]
+            await channel.send("Game over.")
+
+#
+# Register callbacks
+#
+
+cmd.registerCallback("aquatic", aquatic)
+cmd.registerCallback("hangfish", Bot.createHangfishInstance)
+cmd.registerCallback("guess", Bot.updateHangfishInstance)
 
 #
 # Ensure token on first line, with no whitespaces at the end/beginning
 #
-token_file = open("token.txt", "r")
-token = token_file.readline()
-token_file.close()
-print("\'"+token+"\'");
 
-bot = Bot()
-bot.run(token);
+try:
+    token_file = open("token.txt", "r")
+    token = token_file.readline()
+    token_file.close()
+    print("\'"+token+"\'")
+    bot = Bot()
+    bot.run(token)
+except discord.errors.LoginFailure:
+    print("Invalid token")
