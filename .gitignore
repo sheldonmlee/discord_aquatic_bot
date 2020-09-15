@@ -1,0 +1,4 @@
+# exclude vim .swp files
+*.swp
+# ignore token file
+token.txt
