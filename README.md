@@ -1,2 +1,8 @@
 # discord_aquatic_bot
-some shitty bot that prints aquatic emojis.
+
+A simple bot mostly for fun and experimental purposes.
+
+Has ability to:
+
+	- Print aquatic emojis on Discord.
+	- Manage and create instances of hangman (hangfish) for each channel.
