@@ -21,7 +21,7 @@ class Command:
     @staticmethod
     def getCommand(string):
         words = Command.__getWords(string);
-        if words[0].startswith(Command.command_prefix):
+        if words[0].startswith(Command.command_prefix) and len(words) >= 0:
             return words[0][1:]
         return ""
 
