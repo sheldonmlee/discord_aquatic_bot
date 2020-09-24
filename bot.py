@@ -18,13 +18,6 @@ def aquaticAll():
             string += strToEmoji(animal)
     return string
 
-def aquatic(*args):
-    if len(args) > 0:
-        if args[0] == "-a": return aquaticAll()
-        else: return "Unknown Argument: {}".format(args[0])
-    return randomAquatic()
-
-
 class Bot(discord.Client):
 
     hangfish_instances = {}
@@ -43,6 +36,18 @@ class Bot(discord.Client):
 #
 # Define callbacks
 #
+
+    @staticmethod
+    async def aquatic(channel, *args):
+        # Options
+        if len(args) > 0:
+            if args[0] == "-a": 
+                await channel.send(aquaticAll())
+            else: 
+                await channel.send("Unknown Argument: {}".format(args[0]))
+        # Default option
+        else:
+            await channel.send(randomAquatic())
 
     @staticmethod
     def getHangfishInstance(channel):
@@ -76,7 +81,7 @@ class Bot(discord.Client):
 # Register callbacks
 #
 
-cmd.registerCallback("aquatic", aquatic)
+cmd.registerCallback("aquatic", Bot.aquatic)
 cmd.registerCallback("hangfish", Bot.createHangfishInstance)
 cmd.registerCallback("guess", Bot.updateHangfishInstance)
 
