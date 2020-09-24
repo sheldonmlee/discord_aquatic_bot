@@ -1,12 +1,11 @@
 class Hangfish():
-    discord_instances = {}
-    
+
     def __init__(self, word):
         # Word to be guessed
         self.word = word
 
-        # Stores the graphical string of hangman progress.
-        self.graphical_string = ""
+        # Stores the graphical strings of hangman progress.
+        self.frames = Hangfish.getFrames("hangfish_states.txt")
         
         # Keeps track of characters guessed.
         self.guessed_indices = [False] * len(word)
@@ -16,7 +15,8 @@ class Hangfish():
         for i in range(len(word)):
             self.graphical_progress_string += "_"
 
-        self.guesses = 26
+        self.guesses = 10
+        self.attempts = 0
         self.letters_guessed = 0
 
         # Game state
@@ -35,10 +35,10 @@ class Hangfish():
                         self.graphical_progress_string = ''.join(temp_list)
                     self.guessed_indices[i] = True
 
-        self.guesses -= 1
+        self.attempts += 1
 
         word_guessed = self.letters_guessed == len(self.word) or c == self.word
-        out_of_guesses = self.guesses == 0
+        out_of_guesses = self.attempts == self.guesses
 
         if word_guessed or out_of_guesses:
             self.running = False
@@ -49,10 +49,36 @@ class Hangfish():
 
     def getString(self):
         string = ""
-        string += self.graphical_string + 'guesses left = {}\n'.format(self.guesses) + self.graphical_progress_string + '\n'
+        frame = self.frames.get("{}".format(self.attempts+1), None) 
+        if frame is not None:
+            for line in frame:
+                string += line+'\n'
+        
+        string += "guesses left = {}\n".format(self.guesses-self.attempts) + self.graphical_progress_string + '\n'
+
         if not self.running: string += self.status_message
         return string
 
+    @staticmethod
+    def getFrames(filename):
+        file_handle = open(filename)
+        tag = ""
+        frame = []
+        frames = {}
+        while True:
+            line = file_handle.readline()
+            if len(frame) > 0 and (not line.startswith("#") or line == ""):
+                if tag == "":
+                    tag = "Tag: {}".format(len(frames)+1)
+                frames[tag] = frame
+                tag = ""
+                frame = []
+            if line.startswith("!"):
+                tag = line.strip()[1:]
+            elif line.startswith("#"):
+                frame.append(line.strip()[1:])
+            if line == "": break
+        return frames
 
 def main():
     hangfish = Hangfish("Gen")
