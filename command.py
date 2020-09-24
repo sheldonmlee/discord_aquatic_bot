@@ -21,7 +21,8 @@ class Command:
     @staticmethod
     def getCommand(string):
         words = Command.__getWords(string);
-        if words[0].startswith(Command.command_prefix) and len(words) >= 0:
+        if len(words) == 0: return
+        if words[0].startswith(Command.command_prefix):
             return words[0][1:]
         return ""
 
@@ -40,7 +41,8 @@ class Command:
         if func is not None:
             try:
                 await func(channel, *tuple(Command.getArgs(command)))
-            except TypeError:
+            except TypeError as e:
+                print(e)
                 await channel.send("Incorrect usage.")
 
 
