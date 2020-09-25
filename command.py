@@ -19,7 +19,7 @@ class Command:
         return words
 
     @staticmethod
-    def getCommand(string):
+    def __getCommand(string):
         words = Command.__getWords(string);
         if len(words) == 0: return
         if words[0].startswith(Command.command_prefix):
@@ -27,20 +27,21 @@ class Command:
         return ""
 
     @staticmethod
-    def getArgs(string):
+    def __getArgs(string):
         words = Command.__getWords(string);
         return words[1:]
 
+    # Add a command
     @staticmethod
     def registerCallback(command, callback):
         Command.__callbacks[command] = callback
 
     @staticmethod
     async def call(channel, command):
-        func = Command.__callbacks.get(Command.getCommand(command), None)
+        func = Command.__callbacks.get(Command.__getCommand(command), None)
         if func is not None:
             try:
-                await func(channel, *tuple(Command.getArgs(command)))
+                await func(channel, *tuple(Command.__getArgs(command)))
             except TypeError as e:
                 print(e)
                 await channel.send("Incorrect usage.")
