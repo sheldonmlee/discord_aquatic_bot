@@ -18,6 +18,10 @@ def aquaticAll():
             string += strToEmoji(animal)
     return string
 
+#
+# Bot
+#
+
 class Bot(discord.Client):
 
     hangfish_instances = {}
