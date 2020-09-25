@@ -15,29 +15,29 @@ class Hangfish():
         for i in range(len(word)):
             self.graphical_progress_string += "_"
 
+        # Game state
+        self.running = True
+        self.status_message = ""
         self.guesses = 10
         self.attempts = 0
         self.letters_guessed = 0
 
-        # Game state
-        self.running = True
-        self.status_message = ""
-
-    def guess(self, c):
+    # Guess letter or word.
+    def guess(self, guess):
         if not self.running: return
-        if len(c) == 1:
+        if len(guess) == 1:
             for i in range(len(self.word)):
-                if self.word[i] == c:
+                if self.word[i] == guess:
                     if not self.guessed_indices[i]:
                         self.letters_guessed += 1
                         temp_list = list(self.graphical_progress_string)
-                        temp_list[i] = c
+                        temp_list[i] = guess
                         self.graphical_progress_string = ''.join(temp_list)
                     self.guessed_indices[i] = True
 
         self.attempts += 1
 
-        word_guessed = self.letters_guessed == len(self.word) or c == self.word
+        word_guessed = self.letters_guessed == len(self.word) or guess == self.word
         out_of_guesses = self.attempts == self.guesses
 
         if word_guessed or out_of_guesses:
@@ -47,6 +47,7 @@ class Hangfish():
         elif out_of_guesses:
             self.status_message = "Out of Guesses."
 
+    # Get string output of the game.
     def getString(self):
         string = ""
         frame = self.frames.get("{}".format(self.attempts+1), None) 
@@ -59,6 +60,7 @@ class Hangfish():
         if not self.running: string += self.status_message
         return string
 
+    # Load graphics from file
     @staticmethod
     def getFrames(filename):
         file_handle = open(filename)
