@@ -5,7 +5,8 @@ class Hangfish():
         self.word = word
 
         # Stores the graphical strings of hangman progress.
-        self.frames = Hangfish.getFrames("hangfish_states.txt")
+        self.frames = Hangfish.getFrames("hangfish_states.txt", "hangfish_states_example.txt")
+        if self.frames is None: self.frames = {}
         
         # Keeps track of characters guessed.
         self.guessed_indices = [False] * len(word)
@@ -49,12 +50,14 @@ class Hangfish():
 
     # Get string output of the game.
     def getString(self):
+        # Hangfish status.
         string = ""
         frame = self.frames.get("{}".format(self.attempts+1), None) 
+        string += "Hangfish Status:\n"
         if frame is not None:
             for line in frame:
                 string += line+'\n'
-        
+        # Guess left.
         string += "guesses left = {}\n".format(self.guesses-self.attempts) + self.graphical_progress_string + '\n'
 
         if not self.running: string += self.status_message
@@ -62,25 +65,34 @@ class Hangfish():
 
     # Load graphics from file
     @staticmethod
-    def getFrames(filename):
-        file_handle = open(filename)
-        tag = ""
-        frame = []
-        frames = {}
-        while True:
-            line = file_handle.readline()
-            if len(frame) > 0 and (not line.startswith("#") or line == ""):
-                if tag == "":
-                    tag = "Tag: {}".format(len(frames)+1)
-                frames[tag] = frame
+    def getFrames(filename, alt_filename=""):
+        for current_filename in (filename, alt_filename):
+            if current_filename == "": continue;
+            elif current_filename == alt_filename and filename != alt_filename: 
+                print("Trying fallback file: \"{}\"".format(alt_filename))
+            try:
+                file_handle = open(current_filename)
                 tag = ""
                 frame = []
-            if line.startswith("!"):
-                tag = line.strip()[1:]
-            elif line.startswith("#"):
-                frame.append(line.strip()[1:])
-            if line == "": break
-        return frames
+                frames = {}
+                while True:
+                    line = file_handle.readline()
+                    if len(frame) > 0 and (not line.startswith("#") or line == ""):
+                        if tag == "":
+                            tag = "Tag: {}".format(len(frames)+1)
+                        frames[tag] = frame
+                        tag = ""
+                        frame = []
+                    if line.startswith("!"):
+                        tag = line.strip()[1:]
+                    elif line.startswith("#"):
+                        frame.append(line.strip()[1:])
+                    if line == "": break
+                return frames
+            except FileNotFoundError:
+                pass
+        print("Unable to open files.")
+        return None
 
 def main():
     hangfish = Hangfish("Gen")
