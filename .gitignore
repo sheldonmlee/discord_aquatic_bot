@@ -2,3 +2,5 @@
 *.swp
 # ignore token file
 token.txt
+# ignore hangfish text graphics file
+hangfish_states.txt
